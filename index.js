@@ -87,6 +87,20 @@ async function run() {
       res.send(result);
     });
 
+    //facility details read api
+    app.get("/addfacilities/:id", async (req, res) => {
+      const id = req.params.id;
+
+      if (!/^[a-fA-F0-9]{24}$/.test(id)) {
+        res.send({});
+      }
+
+      const query = { _id: new ObjectId(id) };
+      // const query = { _id: id };
+      const result = await facilitiesCollection.findOne(query);
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
