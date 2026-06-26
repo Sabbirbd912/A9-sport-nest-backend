@@ -3,7 +3,8 @@ dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
 const express = require("express");
 const dotenv = require("dotenv");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 dotenv.config();
 
@@ -88,15 +89,15 @@ async function run() {
     });
 
     //facility details read api
-    app.get("/addfacilities/:id", async (req, res) => {
+    app.get("/allfacilities/:id", async (req, res) => {
       const id = req.params.id;
 
       if (!/^[a-fA-F0-9]{24}$/.test(id)) {
         res.send({});
       }
 
-      const query = { _id: new ObjectId(id) };
-      // const query = { _id: id };
+      // const query = { _id: new ObjectId(id) };
+      const query = { _id: id };
       const result = await facilitiesCollection.findOne(query);
       res.send(result);
     });
