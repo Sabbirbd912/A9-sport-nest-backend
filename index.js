@@ -101,6 +101,27 @@ async function run() {
       res.send(result);
     });
 
+    //update api
+    app.patch("/updatefacility/:id", async (req, res) => {
+      const id = req.params.id; //getting facility id from route
+      const query = { _id: new ObjectId(id) }; //making query which facility will be updated
+      // const query = { _id: id };                           //making query which facility will be updated
+      const updatedFacility = req.body; //getting latest data from frontend
+      const update = {
+        //making data $set object to pass in function
+        // $set: updatedFacility;
+        $set: {
+          title: updatedFacility.title,
+          category: updatedFacility.category,
+          summary: updatedFacility.summary,
+          coverImage: updatedFacility.coverImage,
+        },
+      };
+
+      const result = await facilitiesCollection.updateOne(query, update); //updating command
+      res.send(result); //sending response
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
