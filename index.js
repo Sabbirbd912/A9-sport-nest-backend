@@ -80,6 +80,13 @@ async function run() {
       res.send(result);
     });
 
+    //create
+    app.post("/addfacilities", async (req, res) => {
+      const newFacility = req.body;
+      const result = await facilitiesCollection.insertOne(newFacility);
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
