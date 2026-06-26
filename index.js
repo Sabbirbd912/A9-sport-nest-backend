@@ -1,9 +1,9 @@
 const dns = require("node:dns");
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
-const express = require('express');
-const dotenv = require('dotenv');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const express = require("express");
+const dotenv = require("dotenv");
+const { MongoClient, ServerApiVersion } = require("mongodb");
 const app = express();
 dotenv.config();
 
@@ -19,7 +19,7 @@ const client = new MongoClient(uri, {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
-  }
+  },
 });
 
 //MongoDB Function -- all database related APIs created in this function
@@ -29,54 +29,62 @@ async function run() {
     await client.connect();
 
     //getting the database
-    const db = client.db('sport_nest');
+    const db = client.db("sport_nest");
 
     //getting the table/collection
-    const facilitiesCollection = db.collection('facilities');
-    const usersCollection = db.collection('users');
-
+    const facilitiesCollection = db.collection("facilities");
+    const usersCollection = db.collection("users");
 
     //users APIs--------------------------
     //read all users
-        app.get('/users', async (req, res) => {
-            const email = req.query.email;
-            const query = {};
+    app.get("/users", async (req, res) => {
+      const email = req.query.email;
+      const query = {};
 
-            if (email) {
-               query.email = email;
-            }
+      if (email) {
+        query.email = email;
+      }
 
-            const cursor = usersCollection.find(query);
-            const result = await cursor.toArray();
-            res.send(result);
-        })
-
+      const cursor = usersCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
 
     //facilities APIs------------------------
-    //read all facilities or by emails
-    app.get('/allfacilities', async (req, res) => {
-        const { email } = req.query;
-        const query = {};
+    //read api all facilities or facilities by email
+    app.get("/allfacilities", async (req, res) => {
+      const { searchText, category, email } = req.query;
+      const query = {};
 
-        if (email) {
-            query.owner_email = email;
-        }
+      // console.log(category)
+      if (email) {
+        query.userEmail = email;
+      }
 
-        const cursor = facilitiesCollection.find(query);
-        const result = await cursor.toArray();
+      if (category) {
+        const categories = category.split(",");
+        query.category = { $in: categories };
+      }
 
-        res.send(result);
-    })
+      // if (category) {
+      //   query.category = category;
+      // }
 
+      if (searchText) {
+        query.title = { $regex: searchText, $options: "i" };
+      }
 
+      const cursor = facilitiesCollection.find(query);
+      const result = await cursor.toArray();
 
-
-
-
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    console.log(
+      "Pinged your deployment. You successfully connected to MongoDB!",
+    );
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
@@ -84,11 +92,10 @@ async function run() {
 }
 run().catch(console.dir);
 
-app.get('/', (req, res) => {
-    res.send("Server is running fine!")
-})
+app.get("/", (req, res) => {
+  res.send("Server is running fine!");
+});
 
-
-app.listen(PORT, ()=> {
-    console.log(`Server running on port ${PORT}`)
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
